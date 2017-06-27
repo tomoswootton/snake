@@ -1,3 +1,20 @@
+//GENERAL
+$(document).keydown(function(e) {
+  switch (e.which) {
+    case 37:
+    snake[0].direction = 'left';
+    break;
+    case 38:
+    snake[0].direction = 'up';
+    break;
+    case 39:
+    snake[0].direction = 'right';
+    break;
+    case 40:
+    snake[0].direction = 'down';
+    break;
+  }
+})
 $(window).on('load', function() {
 
   //create squares
@@ -17,33 +34,29 @@ $(window).on('load', function() {
     $('.food').css("margin-top", $('.food').css('marginLeft'));
   })
   //force resize listener to set board height
-  spawnSnake();
+  spawnStuff();
   $(window).trigger('resize');
 });``
-
 
 function findSquare(x,y) {
   return $('[data-x='+x+'][data-y='+y+']');
 }
 
-function spawnSnake() {
+function randCoords() {
+  return Math.floor(Math.random() * 20) + 1 ;
+}
+
+//SPAWNERS
+function spawnStuff() {
   snake.push(new Snake_head(10,10,0));
   snake.push(new Snake(9,10,1));
   snake.push(new Snake(8,10,2));
+
   for (i=0;i<=2;i++) {
     snake[i].render();
   }
   snake[snake.length-1].setTail();
-
-}
-
-function addFood() {
-  var food = new Food(randCoords(),randCoords());
-  food.render();
-}
-
-function randCoords() {
-  return Math.floor(Math.random() * 20) + 1 ;
+  addFood();
 }
 
 function addToSnake() {
@@ -53,45 +66,83 @@ function addToSnake() {
   snake[snake.length-1].setTail();
 }
 
-//movement event listeners
-$(document).keydown(function(e) {
-  switch (e.which) {
-    case 37:
-      snake[0].direction = 'left';
-      break;
-    case 38:
-      snake[0].direction = 'up';
-      break;
-    case 39:
-      snake[0].direction = 'right';
-      break;
-    case 40:
-      snake[0].direction = 'down';
-      break;
+function killSnake() {
+  for (i=0;i<=snake.length-1;i++) {
+    snake[i].remove();
   }
-})
+  snake.splice(0,snake.length);
+}
 
-//game running
+function addFood() {
+  var food = new Food(randCoords(),randCoords());
+  food.render();
+}
+
+function killFood() {
+  $('.food').remove();
+}
+
+//running of game
 function run() {
-  if (running) {
-    clearInterval(timer);
-    running = false;
-  } else {
-    timer = setInterval(tick,400);
+  if (!running) {
+    timer = setInterval(tick,tick_time);
     running = true;
+  } else {
+    stopRun();
   }
 }
 
-snake = [];
-running = false;
+function stopRun() {
+  clearInterval(timer);
+  running = false;
+}
+
 function tick() {
+  console.log(tick_time)
   $(window).trigger('resize');
   //for each body and tail part of snake, grab new coords from part infront
-  for (i=snake.length-1;i>=1;i--) {
+  for (i=snake.length-1;i>=0;i--) {
     snake[i].grabNewCoords();
   }
+  //kill if crash
+  if(snakeInSquare(snake[0].x,snake[0].y)) {
+    stopRun();
+    alert('game over');
+    killSnake();
+    spawnStuff();
+    $(window).trigger('resize');
+    return
+  }
+  //eat if crash with food
+  if (appleInSquare(snake[0].x,snake[0].y)) {
+    killFood();
+    addToSnake();
+    addFood();
+    tick_time = tick_time - 8;
+    //stop start to resest speed
+    stopRun();
+    run();
+  }
+
   //for each part, move to new coords
   for (i=0;i<=snake.length-1;i++) {
     snake[i].move();
   }
 }
+
+function snakeInSquare(x,y) {
+  //checks if x,y value has snake
+  if(findSquare(x,y).children().hasClass('snake_body') || findSquare(x,y).children().hasClass('snake_tail')) {
+    return true;
+  }
+}
+
+function appleInSquare(x,y) {
+  if(findSquare(x,y).children().hasClass('food')) {
+    return true;
+  }
+}
+
+snake = [];
+running = false;
+tick_time = 400;

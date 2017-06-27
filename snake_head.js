@@ -1,16 +1,14 @@
 class Snake_head extends Snake {
   constructor(x,y,id) {
-    super(x,y,'',0);
+    super(x,y,0);
     this.$snake = $('<div class="snake_head"></div>');
     this.direction = 'right';
   }
 
-  move() {
-    //move head in current direction
-    this.remove();
+  grabNewCoords() {
     switch (this.direction) {
       case 'up':
-        this.y++
+        this.y++;
         break;
       case 'down':
         this.y--;
@@ -22,6 +20,11 @@ class Snake_head extends Snake {
         this.x++;
         break;
       }
-      this.render();
-    }
+  }
+
+  move() {
+    //move head in current direction
+    this.remove();
+    this.render();
+  }
 }
