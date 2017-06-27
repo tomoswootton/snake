@@ -50,7 +50,7 @@ function findSquare(x,y) {
   return $('[data-x='+x+'][data-y='+y+']');
 }
 
-function randCoords() {
+function randCoord() {
   return Math.floor(Math.random() * 20) + 1 ;
 }
 
@@ -82,8 +82,12 @@ function killSnake() {
 }
 
 function addFood() {
-  var food = new Food(randCoords(),randCoords());
-  food.render();
+  var x = randCoord();
+  var y = randCoord();
+  if (!snakeInSquare(x,y)) {
+    var food = new Food(x,y);
+    food.render();
+  }
 }
 
 function killFood() {
