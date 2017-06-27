@@ -2,16 +2,24 @@
 $(document).keydown(function(e) {
   switch (e.which) {
     case 37:
-    snake[0].direction = 'left';
+    if (snake[0].direction != 'right') {
+      snake[0].direction = 'left';
+    }
     break;
     case 38:
-    snake[0].direction = 'up';
+    if (snake[0].direction != 'down') {
+      snake[0].direction = 'up';
+    }
     break;
     case 39:
-    snake[0].direction = 'right';
+    if (snake[0].direction != 'left') {
+      snake[0].direction = 'right';
+    }
     break;
     case 40:
-    snake[0].direction = 'down';
+    if (snake[0].direction != 'up') {
+      snake[0].direction = 'down';
+    }
     break;
   }
 })
@@ -107,10 +115,12 @@ function tick() {
   //kill if crash
   if(snakeInSquare(snake[0].x,snake[0].y)) {
     stopRun();
-    alert('game over');
+    alert('game over! Your score is '+score+'.');
     killSnake();
+    killFood();
     spawnStuff();
     $(window).trigger('resize');
+    score = 0;
     return
   }
   //eat if crash with food
@@ -122,6 +132,7 @@ function tick() {
     //stop start to resest speed
     stopRun();
     run();
+    score++;
   }
 
   //for each part, move to new coords
@@ -146,3 +157,4 @@ function appleInSquare(x,y) {
 snake = [];
 running = false;
 tick_time = 400;
+score = 0;
